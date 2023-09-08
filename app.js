@@ -11,7 +11,7 @@ app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: t
 app.use(configureSession);
 
 // Conectar a la base de datos MongoDB
-mongoose.connect('mongodb://localhost:27017/cinema_social', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://user_uninorte:uninorte2023@cinema-social.gjlc2ce.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Conexión exitosa a MongoDB');
   })

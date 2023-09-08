@@ -1,13 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+
+// Importa las rutas
+const userRoutes = require('./routes/userRoutes');
+const movieRoutes = require('./routes/movieRoutes');
+const movieListRoutes = require('./routes/movieListRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
 
 const app = express();
 
-// Configuración de la base de datos MongoDB
-mongoose.connect('mongodb://localhost:27017/cinema_social', {
+// Configuración de la conexión a MongoDB con la URL proporcionada
+const mongoDBURL = 'mongodb+srv://user_uninorte:uninorte2023@cinema-social.gjlc2ce.mongodb.net/?retryWrites=true&w=majority';
+
+mongoose.connect(mongoDBURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
@@ -27,9 +34,13 @@ app.use(session({
   saveUninitialized: true,
 }));
 
-// Definición de modelos de datos (debes definirlos según tus necesidades)
+// Llama las rutas
+app.use('/users', userRoutes);
+app.use('/movies', movieRoutes);
+app.use('/lists', movieListRoutes);
+app.use('/ratings', ratingRoutes);
 
-// Rutas de la aplicación (debes definir las rutas en archivos separados)
+// Otras configuraciones y middleware
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;
