@@ -1,36 +1,71 @@
-'use strict'
-
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
+const { configureSession } = require('./sessionMiddleware');
 
 const app = express();
-
-// Carga de rutas
-const user_routes = require('./routes/user');
-const follow_routes = require('./routes/follow');
-const publication_routes = require('./routes/publication');
-const message_routes = require('./routes/message');
-
-// Carga de middlewares (no es mas que un metodo que se ejecua antes de que llegue al controlador)
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: true }));
+app.use(configureSession);
 
-// configurar cabeceras http y cors
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
- 
-    next();
+// Conectar a la base de datos MongoDB
+mongoose.connect('mongodb://localhost:27017/cinema_social', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Conexión exitosa a MongoDB');
+  })
+  .catch(err => {
+    console.error('Error al conectar a MongoDB', err);
+  });
+
+// Definir modelos de datos usando Mongoose
+const UserSchema = new mongoose.Schema({
+  email: { type: String, unique: true, required: true },
+  full_name: { type: String, required: true },
+  nickname: { type: String, unique: true, required: true },
+  birthdate: { type: Date, required: true },
+  password: { type: String, required: true },
 });
 
-// Rutas
-app.use('/api', user_routes);
-app.use('/api', follow_routes);
-app.use('/api', publication_routes);
-app.use('/api', message_routes);
+const MovieSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  year: { type: Number, required: true },
+  image_url: { type: String },
+});
 
-// Exportamos app
+const MovieListSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  creation_date: { type: Date, default: Date.now },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  movies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
+  ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
+});
 
-module.exports = app;
+const RatingSchema = new mongoose.Schema({
+  rating: { type: Number, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  movieList: { type: mongoose.Schema.Types.ObjectId, ref: 'MovieList' },
+});
+
+const User = mongoose.model('User', UserSchema);
+const Movie = mongoose.model('Movie', MovieSchema);
+const MovieList = mongoose.model('MovieList', MovieListSchema);
+const Rating = mongoose.model('Rating', RatingSchema);
+
+// Rutas de la aplicación
+app.get('/', (req, res) => {
+  if (req.session.userId) {
+    // Implementa la lógica para mostrar las listas del usuario autenticado
+  } else {
+    // Implementa la lógica para mostrar listas públicas
+  }
+});
+
+// Implementa las rutas restantes (registro, inicio de sesión, agregar/eliminar películas, calificar listas, ver detalles de lista, etc.)
+
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor en funcionamiento en el puerto ${PORT}`);
+});
