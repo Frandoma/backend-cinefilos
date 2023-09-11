@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: true }));
 app.use(configureSession);
 
+
 // Conectar a la base de datos MongoDB
 mongoose.connect('mongodb+srv://user_uninorte:uninorte2023@cinema-social.gjlc2ce.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -56,13 +57,13 @@ const Rating = mongoose.model('Rating', RatingSchema);
 // Rutas de la aplicación
 app.get('/', (req, res) => {
   if (req.session.userId) {
-    // Implementa la lógica para mostrar las listas del usuario autenticado
+    
   } else {
-    // Implementa la lógica para mostrar listas públicas
+  
   }
 });
 
-// Implementa las rutas restantes (registro, inicio de sesión, agregar/eliminar películas, calificar listas, ver detalles de lista, etc.)
+
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;
